@@ -24,12 +24,25 @@ import java.util.concurrent.Executors;
 public class TaskRunner {
 	private ScheduledExecutorService threadPool;
 	
-	TaskRunner(int threadPoolSize)
+	public TaskRunner(int threadPoolSize)
 	{
 		this.threadPool = Executors.newScheduledThreadPool(threadPoolSize);
 	}
 	
   public <V> Future<V> runTaskAsync(ITask<V> task, int times, long sleepMillis, Class<V> targetClass) throws InterruptedException, ExecutionException {
+	if(times < 1 || times > 5)
+	{
+		throw new IllegalArgumentException("Illegal value given for 'times' argument. The value should be in the range 1-5 inclusive. Actual value: " + times);
+	}
+	else if(sleepMillis < 1 || sleepMillis > 5000)
+	{
+		throw new IllegalArgumentException("Illegal value given for 'sleepMillis' argument. The value should be in the range 1-5000 inclusive. Actual value: " + sleepMillis);
+	}
+	else if(task == null)
+	{
+		throw new NullPointerException("'Task' argument cannot be null.");
+	}
+	
     CompletableFuture<V> completableFuture = new CompletableFuture<V>();
     this.threadPool.schedule(() -> {
     	this.executeTask(task, times, sleepMillis, targetClass, completableFuture);

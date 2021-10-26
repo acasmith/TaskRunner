@@ -20,7 +20,7 @@ public class TaskRunnerTests {
 		
 		
 		// Act
-		Future<Boolean> pendingResult = taskRunner.runTaskAsync(mockSuccessfulTask, 1, 0, Boolean.class);
+		Future<Boolean> pendingResult = taskRunner.runTaskAsync(mockSuccessfulTask, 1, 1, Boolean.class);
 		boolean result = pendingResult.get();
 		
 		// Assert
@@ -37,11 +37,49 @@ public class TaskRunnerTests {
 		
 		
 		// Act
-		Future<Boolean> pendingResult = taskRunner.runTaskAsync(mockSuccessfulTask, 2, 0, Boolean.class);
+		Future<Boolean> pendingResult = taskRunner.runTaskAsync(mockSuccessfulTask, 2, 1, Boolean.class);
 		boolean result = pendingResult.get();
 		
 		// Assert
 		assertTrue("Task should return true on successful completion. Expected: true, actual: " + result, result);
+	}
+	
+	@Test(expected = IllegalArgumentException.class)
+	public void GivenASingleTaskWithAnOutOfBoundsRetryCountWhenTaskSubmittedThenExceptionThrown() throws InterruptedException, ExecutionException
+	{
+		// Arrange
+		TaskRunner taskRunner = new TaskRunner(1);
+		ITask<Boolean> mockSuccessfulTask = (ITask<Boolean>) mock(ITask.class);
+		when(mockSuccessfulTask.call(Boolean.class)).thenReturn(true);
+		when(mockSuccessfulTask.isComplete()).thenReturn(true);
+		
+		
+		// Act
+		Future<Boolean> pendingResult = taskRunner.runTaskAsync(mockSuccessfulTask, 0, 1, Boolean.class);
+	}
+	
+	@Test(expected = IllegalArgumentException.class)
+	public void GivenASingleTaskWithAnOutOfBoundsSleepDurationWhenTaskSubmittedThenExceptionThrown() throws InterruptedException, ExecutionException
+	{
+		// Arrange
+		TaskRunner taskRunner = new TaskRunner(1);
+		ITask<Boolean> mockSuccessfulTask = (ITask<Boolean>) mock(ITask.class);
+		when(mockSuccessfulTask.call(Boolean.class)).thenReturn(true);
+		when(mockSuccessfulTask.isComplete()).thenReturn(true);
+		
+		
+		// Act
+		Future<Boolean> pendingResult = taskRunner.runTaskAsync(mockSuccessfulTask, 1, 0, Boolean.class);
+	}
+	
+	@Test(expected = NullPointerException.class)
+	public void GivenNoTasknWhenTaskSubmittedThenExceptionThrown() throws InterruptedException, ExecutionException
+	{
+		// Arrange
+		TaskRunner taskRunner = new TaskRunner(1);
+		
+		// Act
+		Future<Boolean> pendingResult = taskRunner.runTaskAsync(null, 1, 1, Boolean.class);
 	}
 
 }
