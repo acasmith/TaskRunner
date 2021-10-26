@@ -124,6 +124,45 @@ public class TaskRunnerTests {
 		assertTrue("Both tasks should return true on successful completion. Expected: true, actual: " + (result1 && result2), (result1 && result2));
 	}
 	
+	@Test
+	public void GivenTwoParallelTasksWhenOneTaskSucceedsFirstTimeAndOneTaskFailsFirstTimeThenTaskRunnerReturnsCorrectly() throws InterruptedException, ExecutionException {
+		// Arrange
+		TaskRunner taskRunner = new TaskRunner(2);
+		
+		// Task 1 setup
+		ITask<Boolean> mockSuccessfulTask1 = (ITask<Boolean>) mock(ITask.class);
+		when(mockSuccessfulTask1.call(Boolean.class)).thenAnswer(new Answer() {
+			public Boolean answer(InvocationOnMock invocation) throws InterruptedException
+			{
+				Thread.sleep(1000);
+				return true;
+			}
+		});
+		when(mockSuccessfulTask1.isComplete()).thenReturn(true);
+		
+		// Task 2 Setup
+		ITask<Boolean> mockSuccessfulTask2 = (ITask<Boolean>) mock(ITask.class);
+		when(mockSuccessfulTask2.call(Boolean.class)).thenAnswer(new Answer() {
+			public Boolean answer(InvocationOnMock invocation) throws InterruptedException
+			{
+				Thread.sleep(1000);
+				return false;
+			}
+		});
+		when(mockSuccessfulTask2.isComplete()).thenReturn(false);
+		
+		
+		// Act
+		Future<Boolean> pendingResult1 = taskRunner.runTaskAsync(mockSuccessfulTask1, 1, 1, Boolean.class);
+		Future<Boolean> pendingResult2 = taskRunner.runTaskAsync(mockSuccessfulTask2, 1, 1, Boolean.class);
+		boolean result1 = pendingResult1.get();
+		boolean result2 = pendingResult2.get();
+		
+		// Assert
+		assertTrue("Task 1 should return true on successful completion. Expected: true, actual: " + result1, result1);
+		assertFalse("Task 2 should return false on completion. Expected: false, actual: " + result2, result2);
+	}
+	
 	public void GivenTwoParallelTasksWhenOneTaskSucceedsFirstTimeAndOneTaskSuceedsSecondTimeThenTaskRunnerReturnsCorrectly() throws InterruptedException, ExecutionException {
 		// Arrange
 		TaskRunner taskRunner = new TaskRunner(2);
