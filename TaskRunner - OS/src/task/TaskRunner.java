@@ -1,8 +1,10 @@
 package task;
 
 import java.util.concurrent.Future;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutorService;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
 
 /**
@@ -20,18 +22,38 @@ import java.util.concurrent.Executors;
  */
 
 public class TaskRunner {
-	private ExecutorService threadPool;
+	private ScheduledExecutorService threadPool;
 	
-	TaskRunner()
+	TaskRunner(int threadPoolSize)
 	{
-		this.threadPool = Executors.newCachedThreadPool();
+		this.threadPool = Executors.newScheduledThreadPool(threadPoolSize);
 	}
 	
-  public <V> Future<V> runTaskAsync(ITask<V> task, int times, long sleepMillis, Class<V> targetClass) {
+  public <V> Future<V> runTaskAsync(ITask<V> task, int times, long sleepMillis, Class<V> targetClass) throws InterruptedException, ExecutionException {
     CompletableFuture<V> completableFuture = new CompletableFuture<V>();
-    this.threadPool.submit(() -> {
-    	completableFuture.complete(task.call(targetClass));
-    });
+    this.threadPool.schedule(() -> {
+    	this.executeTask(task, times, sleepMillis, targetClass, completableFuture);
+	}, 0, TimeUnit.MILLISECONDS);    
     return completableFuture;
+  }
+  
+  private <V> void executeTask(ITask<V> task, int remainingAttempts, long sleepMillis, Class<V> targetClass, CompletableFuture<V> completableFuture)
+  {	  
+	V result = task.call(targetClass);
+	if(task.isComplete() || remainingAttempts <= 1)
+	{	    		
+		completableFuture.complete(result);
+	}
+	else
+	{	
+		this.threadPool.schedule(() -> {
+			this.executeTask(task, remainingAttempts - 1, sleepMillis, targetClass, completableFuture);
+	    }, sleepMillis, TimeUnit.MILLISECONDS);		
+	}
+  }
+  
+  public boolean Shutdown(long timeout, TimeUnit unit) throws InterruptedException
+  {
+	  return this.threadPool.awaitTermination(timeout, unit);
   }
 }

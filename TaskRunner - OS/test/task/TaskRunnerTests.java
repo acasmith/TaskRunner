@@ -13,7 +13,7 @@ public class TaskRunnerTests {
 	@Test
 	public void GivenASingleTaskWhenTaskSucceedsFirstTimeThenTaskRunnerReturnsCorrectly() throws InterruptedException, ExecutionException {
 		// Arrange
-		TaskRunner taskRunner = new TaskRunner();
+		TaskRunner taskRunner = new TaskRunner(1);
 		ITask<Boolean> mockSuccessfulTask = (ITask<Boolean>) mock(ITask.class);
 		when(mockSuccessfulTask.call(Boolean.class)).thenReturn(true);
 		when(mockSuccessfulTask.isComplete()).thenReturn(true);
@@ -24,7 +24,24 @@ public class TaskRunnerTests {
 		boolean result = pendingResult.get();
 		
 		// Assert
-		assertTrue("Task should be successfully complete. Expected: true, actual: " + result, result);
+		assertTrue("Task should return true on successful completion. Expected: true, actual: " + result, result);
+	}
+	
+	@Test
+	public void GivenASingleTaskWhenTaskSucceedsSecondTimeThenTaskRunnerReturnsCorrectly() throws InterruptedException, ExecutionException {
+		// Arrange
+		TaskRunner taskRunner = new TaskRunner(1);
+		ITask<Boolean> mockSuccessfulTask = (ITask<Boolean>) mock(ITask.class);
+		when(mockSuccessfulTask.call(Boolean.class)).thenReturn(false, true);
+		when(mockSuccessfulTask.isComplete()).thenReturn(false, true);
+		
+		
+		// Act
+		Future<Boolean> pendingResult = taskRunner.runTaskAsync(mockSuccessfulTask, 2, 0, Boolean.class);
+		boolean result = pendingResult.get();
+		
+		// Assert
+		assertTrue("Task should return true on successful completion. Expected: true, actual: " + result, result);
 	}
 
 }
