@@ -32,17 +32,17 @@ public class TaskSubmitter {
 	  TaskRunner taskRunner = new TaskRunner(2);
 	  
 	  FileCheckerTask<Boolean> fileCheckerTask = new FileCheckerTask<Boolean>(fileName);
-	  //PortAvailableTask<Boolean> portAvailableTask = new PortAvailableTask<Boolean>(8080);    
+	  PortAvailableTask<Boolean> portAvailableTask = new PortAvailableTask<Boolean>(8080);    
     
 	  Future<Boolean> fileCheck = taskRunner.runTaskAsync(fileCheckerTask, 5, 1000, Boolean.class);
-	  //Future<Boolean> portCheck = taskRunner.runTaskAsync(portAvailableTask, 5, 1000, Boolean.class);
+	  Future<Boolean> portCheck = taskRunner.runTaskAsync(portAvailableTask, 5, 1000, Boolean.class);
 	  
 	  boolean fileResult = fileCheck.get();
-	  //boolean portResult = portCheck.get();
+	  boolean portResult = portCheck.get();
 	  
       /* Print the results */
 	  System.out.println("File '" + fileName + "' exists: " + fileResult);
-	  //System.out.println("Port " + portNumber + " is available: " + portResult);
+	  System.out.println("Port " + portNumber + " is available: " + portResult);
 	  
 	  taskRunner.Shutdown(1000, TimeUnit.MILLISECONDS);
   }
