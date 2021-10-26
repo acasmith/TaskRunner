@@ -5,7 +5,11 @@ import task.ITask;
 
 public class PortAvailableTask<T> implements ITask<T>{
 
-  @Override
+  public PortAvailableTask(int targetPort) {
+		// TODO Auto-generated constructor stub
+	}
+
+@Override
   public boolean isComplete() {
     // TODO Auto-generated method stub
     return false;
