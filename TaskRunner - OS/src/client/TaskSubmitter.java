@@ -1,5 +1,12 @@
 package client;
 
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+
+import task.TaskRunner;
+import util.tasks.FileCheckerTask;
+import util.tasks.PortAvailableTask;
+
 /**
  * Main program for creating and submitting tasks to the Task Runner.
  */
@@ -10,11 +17,25 @@ public class TaskSubmitter {
    * @param args
    * @throws Exception
    */
-  public static void main(String[] args) throws Exception {    
-    /* TODO: Instantiate and submit an instance of the FileCheckerTask to the TaskRunner */
+  public static void main(String[] args) throws Exception 
+  {
+	  TaskRunner taskRunner = new TaskRunner(2);
+	  String fileName = "pom.xml";
+	  // int portNumber = 8080;
+	  
+	  FileCheckerTask<Boolean> fileCheckerTask = new FileCheckerTask<Boolean>(fileName);
+	  //PortAvailableTask<Boolean> portAvailableTask = new PortAvailableTask<Boolean>(8080);    
     
-    /* TODO: Instantiate and submit an instance of the PortAvailableTask to the TaskRunner */
-    
-    /* Print the results */
+	  Future<Boolean> fileCheck = taskRunner.runTaskAsync(fileCheckerTask, 5, 1000, Boolean.class);
+	  //Future<Boolean> portCheck = taskRunner.runTaskAsync(portAvailableTask, 5, 1000, Boolean.class);
+	  
+	  boolean fileResult = fileCheck.get();
+	  //boolean portResult = portCheck.get();
+	  
+      /* Print the results */
+	  System.out.println("File '" + fileName + "' exists: " + fileResult);
+	  //System.out.println("Port " + portNumber + " is available: " + portResult);
+	  
+	  taskRunner.Shutdown(1000, TimeUnit.MILLISECONDS);
   }
 }

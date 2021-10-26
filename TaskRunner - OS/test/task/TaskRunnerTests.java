@@ -217,7 +217,6 @@ public class TaskRunnerTests {
 		assertTrue("Both tasks should return true on successful completion. Expected: true, actual: " + (result1 && result2), (result1 && result2));
 		assertTrue("call() should be invoked multiple times.", verify(mockSuccessfulTask1, times(2)).call(any()));
 		assertTrue("call() should be invoked once times.", verify(mockSuccessfulTask2, times(1)).call(any()));
-	}	
-	
+	}
 
 }

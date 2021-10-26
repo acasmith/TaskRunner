@@ -17,7 +17,7 @@ public class FileCheckerTask<T> implements ITask<T>{
   private File fileToCheck;
   private boolean isComplete = false;
   
-  FileCheckerTask(String fileName) throws NullPointerException {
+  public FileCheckerTask(String fileName) throws NullPointerException {
     this.fileToCheck = new File(fileName);
   }
   
