@@ -32,6 +32,23 @@ public class TaskRunnerTests {
 	}
 	
 	@Test
+	public void GivenASingleTaskWhenTaskFailsFirstTimeThenTaskRunnerReturnsCorrectly() throws InterruptedException, ExecutionException {
+		// Arrange
+		TaskRunner taskRunner = new TaskRunner(1);
+		ITask<Boolean> mockSuccessfulTask = (ITask<Boolean>) mock(ITask.class);
+		when(mockSuccessfulTask.call(Boolean.class)).thenReturn(false);
+		when(mockSuccessfulTask.isComplete()).thenReturn(false);
+		
+		
+		// Act
+		Future<Boolean> pendingResult = taskRunner.runTaskAsync(mockSuccessfulTask, 1, 1, Boolean.class);
+		boolean result = pendingResult.get();
+		
+		// Assert
+		assertFalse("Task should return false on completion. Expected: false, actual: " + result, result);
+	}
+	
+	@Test
 	public void GivenASingleTaskWhenTaskSucceedsSecondTimeThenTaskRunnerReturnsCorrectly() throws InterruptedException, ExecutionException {
 		// Arrange
 		TaskRunner taskRunner = new TaskRunner(1);
@@ -200,6 +217,7 @@ public class TaskRunnerTests {
 		assertTrue("Both tasks should return true on successful completion. Expected: true, actual: " + (result1 && result2), (result1 && result2));
 		assertTrue("call() should be invoked multiple times.", verify(mockSuccessfulTask1, times(2)).call(any()));
 		assertTrue("call() should be invoked once times.", verify(mockSuccessfulTask2, times(1)).call(any()));
-	}
+	}	
+	
 
 }
