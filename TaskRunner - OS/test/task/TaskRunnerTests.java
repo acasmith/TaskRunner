@@ -3,6 +3,7 @@ package task;
 import static org.junit.Assert.*;
 
 import org.junit.Test;
+import org.mockito.Mockito;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
@@ -95,9 +96,7 @@ public class TaskRunnerTests {
 		when(mockSuccessfulTask1.call(Boolean.class)).thenAnswer(new Answer() {
 			public Boolean answer(InvocationOnMock invocation) throws InterruptedException
 			{
-				System.out.println("mock1 called");
 				Thread.sleep(1000);
-				System.out.println("mock1 completing");
 				return true;
 			}
 		});
@@ -108,9 +107,7 @@ public class TaskRunnerTests {
 		when(mockSuccessfulTask2.call(Boolean.class)).thenAnswer(new Answer() {
 			public Boolean answer(InvocationOnMock invocation) throws InterruptedException
 			{
-				System.out.println("mock2 called");
 				Thread.sleep(1000);
-				System.out.println("mock2 completing");
 				return true;
 			}
 		});
@@ -125,6 +122,45 @@ public class TaskRunnerTests {
 		
 		// Assert
 		assertTrue("Both tasks should return true on successful completion. Expected: true, actual: " + (result1 && result2), (result1 && result2));
+	}
+	
+	public void GivenTwoParallelTasksWhenOneTaskSucceedsFirstTimeAndOneTaskSuceedsSecondTimeThenTaskRunnerReturnsCorrectly() throws InterruptedException, ExecutionException {
+		// Arrange
+		TaskRunner taskRunner = new TaskRunner(2);
+		
+		// Task 1 setup
+		ITask<Boolean> mockSuccessfulTask1 = (ITask<Boolean>) mock(ITask.class);
+		when(mockSuccessfulTask1.call(Boolean.class)).thenReturn(false).thenAnswer(new Answer() {
+			public Boolean answer(InvocationOnMock invocation) throws InterruptedException
+			{
+				Thread.sleep(1000);
+				return true;
+			}
+		});
+		when(mockSuccessfulTask1.isComplete()).thenReturn(false).thenReturn(true);
+		
+		// Task 2 Setup
+		ITask<Boolean> mockSuccessfulTask2 = (ITask<Boolean>) mock(ITask.class);
+		when(mockSuccessfulTask2.call(Boolean.class)).thenAnswer(new Answer() {
+			public Boolean answer(InvocationOnMock invocation) throws InterruptedException
+			{
+				Thread.sleep(1000);
+				return true;
+			}
+		});
+		when(mockSuccessfulTask2.isComplete()).thenReturn(true);
+		
+		
+		// Act
+		Future<Boolean> pendingResult1 = taskRunner.runTaskAsync(mockSuccessfulTask1, 2, 1, Boolean.class);
+		Future<Boolean> pendingResult2 = taskRunner.runTaskAsync(mockSuccessfulTask2, 1, 1, Boolean.class);
+		boolean result1 = pendingResult1.get();
+		boolean result2 = pendingResult2.get();
+		
+		// Assert
+		assertTrue("Both tasks should return true on successful completion. Expected: true, actual: " + (result1 && result2), (result1 && result2));
+		assertTrue("call() should be invoked multiple times.", verify(mockSuccessfulTask1, times(2)).call(any()));
+		assertTrue("call() should be invoked once times.", verify(mockSuccessfulTask2, times(1)).call(any()));
 	}
 
 }
