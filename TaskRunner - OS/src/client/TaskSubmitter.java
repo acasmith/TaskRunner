@@ -19,9 +19,17 @@ public class TaskSubmitter {
    */
   public static void main(String[] args) throws Exception 
   {
-	  TaskRunner taskRunner = new TaskRunner(2);
 	  String fileName = "pom.xml";
-	  // int portNumber = 8080;
+	  int portNumber = 8080;
+	  if(args.length > 0)
+	  {
+		  fileName = args[0];
+	  }
+	  if(args.length > 1)
+	  {
+		  portNumber = Integer.parseInt(args[1]);
+	  }
+	  TaskRunner taskRunner = new TaskRunner(2);
 	  
 	  FileCheckerTask<Boolean> fileCheckerTask = new FileCheckerTask<Boolean>(fileName);
 	  //PortAvailableTask<Boolean> portAvailableTask = new PortAvailableTask<Boolean>(8080);    
