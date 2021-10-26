@@ -1,6 +1,9 @@
 package task;
 
 import java.util.concurrent.Future;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /**
    * Runs a submitted task <code>times</code> number of times
@@ -17,7 +20,18 @@ import java.util.concurrent.Future;
  */
 
 public class TaskRunner {
-  public <V> Future<V> runTaskAsync(ITask<V> task, int times, long sleepMillis) {
-    return null;
+	private ExecutorService threadPool;
+	
+	TaskRunner()
+	{
+		this.threadPool = Executors.newCachedThreadPool();
+	}
+	
+  public <V> Future<V> runTaskAsync(ITask<V> task, int times, long sleepMillis, Class<V> targetClass) {
+    CompletableFuture<V> completableFuture = new CompletableFuture<V>();
+    this.threadPool.submit(() -> {
+    	completableFuture.complete(task.call(targetClass));
+    });
+    return completableFuture;
   }
 }
