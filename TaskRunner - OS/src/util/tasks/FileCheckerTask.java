@@ -1,7 +1,11 @@
 package util.tasks;
 
-import task.ITask;
+import java.io.File;
 
+import task.ITask;
+import java.lang.Boolean;
+import java.net.URI;
+import java.net.URISyntaxException;
 
 /**
  * 
@@ -10,21 +14,32 @@ import task.ITask;
  * @param <T>
  */
 public class FileCheckerTask<T> implements ITask<T>{
+  private File fileToCheck;
+  private boolean isComplete = false;
   
-  FileCheckerTask(String fileName) {
-    
+  FileCheckerTask(String fileName) throws NullPointerException {
+    this.fileToCheck = new File(fileName);
   }
   
   @Override
-  public boolean isComplete() {
-    // TODO Auto-generated method stub
-    return false;
+  public boolean isComplete() {    
+    return this.isComplete;
   }
 
   @Override
-  public T call() {
-    // TODO Auto-generated method stub
-    return null;
+  public T call(Class<T> targetClass) throws ClassCastException {
+	boolean fileExists = fileToCheck.exists();
+	if(fileExists)
+	{
+		this.setIsComplete();
+	}
+    T result = targetClass.cast(fileExists);    
+    return result;
+  }
+  
+  private void setIsComplete()
+  {
+	  this.isComplete = true;
   }
 
 }

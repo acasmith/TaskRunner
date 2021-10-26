@@ -12,7 +12,7 @@ public class PortAvailableTask<T> implements ITask<T>{
   }
 
   @Override
-  public T call() {
+  public T call(Class<T> targetClass) {
     // TODO Auto-generated method stub
     return null;
   }

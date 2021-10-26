@@ -18,7 +18,8 @@ public interface ITask<T> {
    * Does the actual work and returns 
    * a result.
    *  
+   *  Added a target class so we can cast the result inside the call method and fail fast.
    */
-  public T call();
+  public T call(Class<T> targetClass) throws ClassCastException;
 }
 
