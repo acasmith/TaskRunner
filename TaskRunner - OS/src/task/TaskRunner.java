@@ -51,6 +51,20 @@ public class TaskRunner {
     return completableFuture;
   }
   
+  /**
+   * Helper method for handling task execution.
+   * If the task finishes and is 'complete' then the result is returned as the task result.
+   * If the task finishes but is not 'complete' and has attempts remaining then the task will be scheduled to run on a new thread to try and ensure fair access to resources for queued tasks.
+   * If the task finishes but is not 'complete' and has no attempts remaining then the last result is returned as the task result.
+   * If the task throws an exception and has attempts remaining then an attempt will be made to honour the timeout before running the task again on the same thread. This is to minimise complexity of ensuring the Future remains completable.
+   * If the task throws an exception and has no attempts remaining then the exception is propagated as the result of the task.
+   * If the task throws a ClassCastException then it is assumed to be programmer error when specifying task return type and the task completes early.
+   * @param task
+   * @param remainingAttempts
+   * @param sleepMillis
+   * @param targetClass
+   * @param completableFuture
+   */
   private <V> void executeTask(ITask<V> task, int remainingAttempts, long sleepMillis, Class<V> targetClass, CompletableFuture<V> completableFuture)
   {	
 	try
@@ -68,17 +82,23 @@ public class TaskRunner {
 		}
 	}
 	catch(Exception e)
-	{
+	{		
 		if(e.getClass() == ClassCastException.class || remainingAttempts <=1)
 		{
 			completableFuture.completeExceptionally(e);
-		}
+		}		
 		else
 		{
 			e.printStackTrace();
-			this.threadPool.schedule(() -> {
+			try {
+				Thread.sleep(sleepMillis);
+			} catch (InterruptedException e1) {
+				e1.printStackTrace();
+			}
+			finally
+			{
 				this.executeTask(task, remainingAttempts - 1, sleepMillis, targetClass, completableFuture);
-		    }, sleepMillis, TimeUnit.MILLISECONDS);
+			}
 		}	
 	}	
   }
