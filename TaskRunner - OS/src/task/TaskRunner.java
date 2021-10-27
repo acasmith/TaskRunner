@@ -1,6 +1,7 @@
 package task;
 
 import java.util.concurrent.Future;
+import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.CompletableFuture;
@@ -51,18 +52,35 @@ public class TaskRunner {
   }
   
   private <V> void executeTask(ITask<V> task, int remainingAttempts, long sleepMillis, Class<V> targetClass, CompletableFuture<V> completableFuture)
-  {	  
-	V result = task.call(targetClass);
-	if(task.isComplete() || remainingAttempts <= 1)
-	{	    		
-		completableFuture.complete(result);
+  {	
+	try
+	{
+		V result = task.call(targetClass);
+		if(task.isComplete() || remainingAttempts <= 1)
+		{	    		
+			completableFuture.complete(result);
+		}
+		else
+		{	
+			this.threadPool.schedule(() -> {
+				this.executeTask(task, remainingAttempts - 1, sleepMillis, targetClass, completableFuture);
+		    }, sleepMillis, TimeUnit.MILLISECONDS);		
+		}
 	}
-	else
-	{	
-		this.threadPool.schedule(() -> {
-			this.executeTask(task, remainingAttempts - 1, sleepMillis, targetClass, completableFuture);
-	    }, sleepMillis, TimeUnit.MILLISECONDS);		
-	}
+	catch(Exception e)
+	{
+		if(e.getClass() == ClassCastException.class || remainingAttempts <=1)
+		{
+			completableFuture.completeExceptionally(e);
+		}
+		else
+		{
+			e.printStackTrace();
+			this.threadPool.schedule(() -> {
+				this.executeTask(task, remainingAttempts - 1, sleepMillis, targetClass, completableFuture);
+		    }, sleepMillis, TimeUnit.MILLISECONDS);
+		}	
+	}	
   }
   
   public boolean Shutdown(long timeout, TimeUnit unit) throws InterruptedException

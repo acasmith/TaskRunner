@@ -14,7 +14,7 @@ public class PortAvailableTask<T> implements ITask<T>{
   public PortAvailableTask(int targetPort) {
 	  if(targetPort < 1 || targetPort > 65535)
 	  {
-		  throw new IllegalArgumentException("Port number out of range. Port number must be in range 0 - 65535 inclusive. Provided value: " + targetPort);
+		  throw new IllegalArgumentException("Port number out of range. Port number must be in range 1 - 65535 inclusive. Provided value: " + targetPort);
 	  }
 	  this.targetPort = targetPort;
 	}
@@ -25,7 +25,7 @@ public class PortAvailableTask<T> implements ITask<T>{
   }
 
   @Override
-  public T call(Class<T> targetClass) {
+  public T call(Class<T> targetClass) throws ClassCastException {
     try {
 		ServerSocket serverSocket = new ServerSocket(this.targetPort);
 		serverSocket.close();

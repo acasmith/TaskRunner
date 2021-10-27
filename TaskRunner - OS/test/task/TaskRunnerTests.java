@@ -9,6 +9,7 @@ import org.mockito.stubbing.Answer;
 
 import static org.mockito.Mockito.*;
 
+import java.io.IOException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
@@ -46,6 +47,37 @@ public class TaskRunnerTests {
 		
 		// Assert
 		assertFalse("Task should return false on completion. Expected: false, actual: " + result, result);
+	}
+	
+	
+	@Test
+	public void GivenASingleTaskWhenTaskIsIncorrectlyTypedThenCorrectExceptionReturned() throws InterruptedException, ExecutionException {
+		// Arrange
+		TaskRunner taskRunner = new TaskRunner(1);
+		ITask<Boolean> mockSuccessfulTask = (ITask<Boolean>) mock(ITask.class);
+		when(mockSuccessfulTask.call(Boolean.class)).thenThrow(new ClassCastException());
+		when(mockSuccessfulTask.isComplete()).thenReturn(false);
+		
+		
+		// Act
+		Future<Boolean> pendingResult = taskRunner.runTaskAsync(mockSuccessfulTask, 1, 1, Boolean.class);
+		ExecutionException exception = assertThrows(ExecutionException.class, () -> pendingResult.get());
+		assertEquals(exception.getCause().getClass(), ClassCastException.class);
+	}
+	
+	@Test
+	public void GivenASingleTaskWhenTaskThrowsExceptionThenCorrectExceptionReturned() throws InterruptedException, ExecutionException {
+		// Arrange
+		TaskRunner taskRunner = new TaskRunner(1);
+		ITask<Boolean> mockSuccessfulTask = (ITask<Boolean>) mock(ITask.class);
+		when(mockSuccessfulTask.call(Boolean.class)).thenThrow(new IllegalArgumentException());
+		when(mockSuccessfulTask.isComplete()).thenReturn(false);
+		
+		
+		// Act
+		Future<Boolean> pendingResult = taskRunner.runTaskAsync(mockSuccessfulTask, 1, 1, Boolean.class);
+		ExecutionException exception = assertThrows(ExecutionException.class, () -> pendingResult.get());
+		assertEquals(exception.getCause().getClass(), IllegalArgumentException.class);
 	}
 	
 	@Test
