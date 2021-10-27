@@ -12,7 +12,7 @@ public class PortAvailableTaskTests {
 
 	// Flakey unit tests - relying on actual ports in the tests. 
 	// For production code refactor to inject socket to enable mocking of port interactions.
-	// Haven't done so here as it felt a bit OTT!
+	// Haven't done so here as it felt a bit OTT for a short-lived toy problem!
 	
 	private static int targetPort = 56789;
 	

@@ -17,7 +17,7 @@ public class FileCheckerTaskTests {
 	
 	// Flakey unit tests - relying on file system access. 
 	// For production code refactor to inject file checking object to enable mocking of filesystem interactions.
-	// Haven't done so here as it felt a bit OTT!
+	// Haven't done so here as it felt a bit OTT for a short-lived toy problem!
 	@BeforeClass
 	public static void SetupValidFile()
 	{

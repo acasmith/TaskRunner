@@ -1,7 +1,6 @@
 package task;
 
 import java.util.concurrent.Future;
-import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.CompletableFuture;
@@ -9,6 +8,21 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
 
 /**
+ * Task runner that can accept <code>ITask</code>s and execute them asynchronously.
+ */
+public class TaskRunner {
+	private ScheduledExecutorService threadPool;
+	
+	/**
+	 * 
+	 * @param threadPoolSize - the number of threads to keep in the pool, even if they are idle.
+	 */
+	public TaskRunner(int threadPoolSize)
+	{
+		this.threadPool = Executors.newScheduledThreadPool(threadPoolSize);
+	}
+	
+  /**
    * Runs a submitted task <code>times</code> number of times
    * and supports a sleep interval of <code>sleepMillis</code> between
    * each run and returns a Future result.
@@ -16,20 +30,14 @@ import java.util.concurrent.Executors;
    * This method returns immediately with a Future object 
    * which can be used to obtain the result of the task 
    * when the task completes. 
-   * 
    * @param task
    * @param times
    * @param sleepMillis
- */
-
-public class TaskRunner {
-	private ScheduledExecutorService threadPool;
-	
-	public TaskRunner(int threadPoolSize)
-	{
-		this.threadPool = Executors.newScheduledThreadPool(threadPoolSize);
-	}
-	
+   * @param targetClass
+   * @return
+   * @throws InterruptedException
+   * @throws ExecutionException
+   */
   public <V> Future<V> runTaskAsync(ITask<V> task, int times, long sleepMillis, Class<V> targetClass) throws InterruptedException, ExecutionException {
 	if(times < 1 || times > 5)
 	{
@@ -52,7 +60,7 @@ public class TaskRunner {
   }
   
   /**
-   * Helper method for handling task execution.
+   * Helper method for handling task execution. Final result is passed out via completeableFuture argument.
    * If the task finishes and is 'complete' then the result is returned as the task result.
    * If the task finishes but is not 'complete' and has attempts remaining then the task will be scheduled to run on a new thread to try and ensure fair access to resources for queued tasks.
    * If the task finishes but is not 'complete' and has no attempts remaining then the last result is returned as the task result.
@@ -103,6 +111,15 @@ public class TaskRunner {
 	}	
   }
   
+  /**
+   * Handles graceful shutdown of thread pool by blocking until either 
+   * all scheduled work is completed or the timeout completes and forcibly 
+   * closes the pool.
+   * @param timeout - the maximum time to wait
+   * @param unit - the time unit of the timeout argument
+   * @return - true if thread pool terminated gracefully and false if the timeout elapsed before termination.
+   * @throws InterruptedException - if interrupted while waiting
+   */
   public boolean Shutdown(long timeout, TimeUnit unit) throws InterruptedException
   {
 	  return this.threadPool.awaitTermination(timeout, unit);

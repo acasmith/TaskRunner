@@ -18,7 +18,7 @@ public interface ITask<T> {
    * Does the actual work and returns 
    * a result.
    *  
-   *  Added a target class so we can cast the result inside the call method and fail fast.
+   *  @param targetClass - Intended class for the return. Specifying this allows hard-casting the result inside the method. This enables us to fail fast in a controlled environment in the event of a type mismatch.
    */
   public T call(Class<T> targetClass) throws ClassCastException;
 }

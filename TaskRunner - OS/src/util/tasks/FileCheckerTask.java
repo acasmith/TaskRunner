@@ -8,10 +8,8 @@ import java.net.URI;
 import java.net.URISyntaxException;
 
 /**
- * 
- * Checks if the passed in file name exists
- *
- * @param <T>
+ * A task for checking the existence of a given filename on the local filesystem.
+ * @param <T> - The return type of this tasks <code>call</code> implementation.
  */
 public class FileCheckerTask<T> implements ITask<T>{
   private File fileToCheck;

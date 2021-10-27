@@ -5,7 +5,10 @@ import java.net.ServerSocket;
 
 import task.ITask;
 
-
+/**
+ * A task for checking the availability of a given port on the local machine.
+ * @param <T> - The return type of this tasks <code>call</code> implementation.
+ */
 public class PortAvailableTask<T> implements ITask<T>{
 	
 	private final int targetPort;
