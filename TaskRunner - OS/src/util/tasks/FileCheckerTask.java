@@ -12,7 +12,7 @@ import java.net.URISyntaxException;
  * @param <T> - The return type of this tasks <code>call</code> implementation.
  */
 public class FileCheckerTask<T> implements ITask<T>{
-  private File fileToCheck;
+  private final File fileToCheck;
   private boolean isComplete = false;
   
   public FileCheckerTask(String fileName) throws NullPointerException {

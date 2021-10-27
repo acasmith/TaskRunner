@@ -11,7 +11,7 @@ import java.util.concurrent.Executors;
  * Task runner that can accept <code>ITask</code>s and execute them asynchronously.
  */
 public class TaskRunner {
-	private ScheduledExecutorService threadPool;
+	private final ScheduledExecutorService threadPool;
 	
 	/**
 	 * 
