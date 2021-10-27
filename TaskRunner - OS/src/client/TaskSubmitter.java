@@ -29,10 +29,10 @@ public class TaskSubmitter {
 	  {
 		  portNumber = Integer.parseInt(args[1]);
 	  }
-	  TaskRunner taskRunner = new TaskRunner(2);
+	  TaskRunner taskRunner = new TaskRunner(10);
 	  
 	  FileCheckerTask<Boolean> fileCheckerTask = new FileCheckerTask<Boolean>(fileName);
-	  PortAvailableTask<Boolean> portAvailableTask = new PortAvailableTask<Boolean>(8080);    
+	  PortAvailableTask<Boolean> portAvailableTask = new PortAvailableTask<Boolean>(portNumber);    
     
 	  Future<Boolean> fileCheck = taskRunner.runTaskAsync(fileCheckerTask, 5, 1000, Boolean.class);
 	  Future<Boolean> portCheck = taskRunner.runTaskAsync(portAvailableTask, 5, 1000, Boolean.class);
