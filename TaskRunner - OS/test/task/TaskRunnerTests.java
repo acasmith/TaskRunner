@@ -3,13 +3,11 @@ package task;
 import static org.junit.Assert.*;
 
 import org.junit.Test;
-import org.mockito.Mockito;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
 import static org.mockito.Mockito.*;
 
-import java.io.IOException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
@@ -108,7 +106,7 @@ public class TaskRunnerTests {
 		
 		
 		// Act
-		Future<Boolean> pendingResult = taskRunner.runTaskAsync(mockSuccessfulTask, 0, 1, Boolean.class);
+		taskRunner.runTaskAsync(mockSuccessfulTask, 0, 1, Boolean.class);
 	}
 	
 	@Test(expected = IllegalArgumentException.class)
@@ -122,7 +120,7 @@ public class TaskRunnerTests {
 		
 		
 		// Act
-		Future<Boolean> pendingResult = taskRunner.runTaskAsync(mockSuccessfulTask, 1, 0, Boolean.class);
+		taskRunner.runTaskAsync(mockSuccessfulTask, 1, 0, Boolean.class);
 	}
 	
 	@Test(expected = NullPointerException.class)
@@ -132,7 +130,7 @@ public class TaskRunnerTests {
 		TaskRunner taskRunner = new TaskRunner(1);
 		
 		// Act
-		Future<Boolean> pendingResult = taskRunner.runTaskAsync(null, 1, 1, Boolean.class);
+		taskRunner.runTaskAsync(null, 1, 1, Boolean.class);
 	}
 	
 	@Test
@@ -142,7 +140,7 @@ public class TaskRunnerTests {
 		
 		// Task 1 setup
 		ITask<Boolean> mockSuccessfulTask1 = (ITask<Boolean>) mock(ITask.class);
-		when(mockSuccessfulTask1.call(Boolean.class)).thenAnswer(new Answer() {
+		when(mockSuccessfulTask1.call(Boolean.class)).thenAnswer(new Answer<Boolean>() {
 			public Boolean answer(InvocationOnMock invocation) throws InterruptedException
 			{
 				Thread.sleep(1000);
@@ -153,7 +151,7 @@ public class TaskRunnerTests {
 		
 		// Task 2 Setup
 		ITask<Boolean> mockSuccessfulTask2 = (ITask<Boolean>) mock(ITask.class);
-		when(mockSuccessfulTask2.call(Boolean.class)).thenAnswer(new Answer() {
+		when(mockSuccessfulTask2.call(Boolean.class)).thenAnswer(new Answer<Boolean>() {
 			public Boolean answer(InvocationOnMock invocation) throws InterruptedException
 			{
 				Thread.sleep(1000);
@@ -180,7 +178,7 @@ public class TaskRunnerTests {
 		
 		// Task 1 setup
 		ITask<Boolean> mockSuccessfulTask1 = (ITask<Boolean>) mock(ITask.class);
-		when(mockSuccessfulTask1.call(Boolean.class)).thenAnswer(new Answer() {
+		when(mockSuccessfulTask1.call(Boolean.class)).thenAnswer(new Answer<Boolean>() {
 			public Boolean answer(InvocationOnMock invocation) throws InterruptedException
 			{
 				Thread.sleep(1000);
@@ -191,7 +189,7 @@ public class TaskRunnerTests {
 		
 		// Task 2 Setup
 		ITask<Boolean> mockSuccessfulTask2 = (ITask<Boolean>) mock(ITask.class);
-		when(mockSuccessfulTask2.call(Boolean.class)).thenAnswer(new Answer() {
+		when(mockSuccessfulTask2.call(Boolean.class)).thenAnswer(new Answer<Boolean>() {
 			public Boolean answer(InvocationOnMock invocation) throws InterruptedException
 			{
 				Thread.sleep(1000);
@@ -218,7 +216,7 @@ public class TaskRunnerTests {
 		
 		// Task 1 setup
 		ITask<Boolean> mockSuccessfulTask1 = (ITask<Boolean>) mock(ITask.class);
-		when(mockSuccessfulTask1.call(Boolean.class)).thenReturn(false).thenAnswer(new Answer() {
+		when(mockSuccessfulTask1.call(Boolean.class)).thenReturn(false).thenAnswer(new Answer<Boolean>() {
 			public Boolean answer(InvocationOnMock invocation) throws InterruptedException
 			{
 				Thread.sleep(1000);
@@ -229,7 +227,7 @@ public class TaskRunnerTests {
 		
 		// Task 2 Setup
 		ITask<Boolean> mockSuccessfulTask2 = (ITask<Boolean>) mock(ITask.class);
-		when(mockSuccessfulTask2.call(Boolean.class)).thenAnswer(new Answer() {
+		when(mockSuccessfulTask2.call(Boolean.class)).thenAnswer(new Answer<Boolean>() {
 			public Boolean answer(InvocationOnMock invocation) throws InterruptedException
 			{
 				Thread.sleep(1000);

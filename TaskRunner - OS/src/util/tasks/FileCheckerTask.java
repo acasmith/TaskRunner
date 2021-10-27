@@ -3,9 +3,6 @@ package util.tasks;
 import java.io.File;
 
 import task.ITask;
-import java.lang.Boolean;
-import java.net.URI;
-import java.net.URISyntaxException;
 
 /**
  * A task for checking the existence of a given filename on the local filesystem.

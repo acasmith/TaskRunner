@@ -9,8 +9,6 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import junit.framework.Assert;
-
 public class FileCheckerTaskTests {
 	private static final String existsFileName = "exists.txt";
 	private static final String nonExistantFileName = "doesNotExist.txt";
@@ -83,7 +81,7 @@ public class FileCheckerTaskTests {
 	public void GivenInvalidFileNameWhenTaskCreatedThenAnExceptionIsThrown()
 	{
 		// Arrange
-		FileCheckerTask<Boolean> fileChecker = new FileCheckerTask<Boolean>(null);
+		new FileCheckerTask<Boolean>(null);
 		
 		// Act		
 		
@@ -98,7 +96,7 @@ public class FileCheckerTaskTests {
 		assertFalse(fileChecker.isComplete());
 		
 		// Act
-		String result = fileChecker.call(String.class);
+		fileChecker.call(String.class);
 		
 		// Assert		
 	}

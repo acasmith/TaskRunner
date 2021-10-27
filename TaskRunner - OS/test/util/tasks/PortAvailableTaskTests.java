@@ -4,7 +4,6 @@ import static org.junit.Assert.*;
 
 import java.io.IOException;
 import java.net.ServerSocket;
-import java.net.Socket;
 
 import org.junit.Test;
 
@@ -45,12 +44,12 @@ public class PortAvailableTaskTests {
 	@Test(expected = IllegalArgumentException.class)
 	public void GivenAPortNumberBelowLowerBoundWhenTaskCreatedThenCorrectExceptionThrown() throws IOException {
 		// Arrange
-		PortAvailableTask<Boolean> portAvailableTask = new PortAvailableTask<Boolean>(-1);
+		new PortAvailableTask<Boolean>(-1);
 	}
 	
 	@Test(expected = IllegalArgumentException.class)
 	public void GivenAPortNumberAboveUpperBoundWhenTaskCreatedThenCorrectExceptionThrown() throws IOException {
 		// Arrange
-		PortAvailableTask<Boolean> portAvailableTask = new PortAvailableTask<Boolean>(70000);
+		new PortAvailableTask<Boolean>(70000);
 	}
 }
