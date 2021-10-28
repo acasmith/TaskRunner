@@ -4,6 +4,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
@@ -81,9 +82,8 @@ public class TaskRunner
 	 * the last result is returned as the task result.
 	 *
 	 * If the task throws an exception and has attempts remaining then an attempt
-	 * will be made to honour the timeout before running the task again on the same
-	 * thread. This is to minimise complexity of ensuring the Future remains
-	 * completable.
+	 * will be made to schedule the task again on a new thread. If the scheduling
+	 * fails then the exception is propagated as the result of the task.
 	 *
 	 * If the task throws an exception and has no attempts remaining then the
 	 * exception is propagated as the result of the task.
@@ -122,13 +122,12 @@ public class TaskRunner
 				e.printStackTrace();
 				try
 				{
-					Thread.sleep(sleepMillis);
-				} catch (final InterruptedException e1)
+					this.threadPool.schedule(() -> {
+						this.executeTask(task, remainingAttempts - 1, sleepMillis, targetClass, completableFuture);
+					}, sleepMillis, TimeUnit.MILLISECONDS);
+				} catch (final RejectedExecutionException | NullPointerException e1)
 				{
-					e1.printStackTrace();
-				} finally
-				{
-					this.executeTask(task, remainingAttempts - 1, sleepMillis, targetClass, completableFuture);
+					completableFuture.completeExceptionally(e);	// If even scheduling fails, stop trying to execute the task.
 				}
 			}
 		}
